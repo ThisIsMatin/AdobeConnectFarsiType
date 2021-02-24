@@ -8,8 +8,6 @@ import sys
 class AdobeConnectFarsiType:
     def __init__(self):
 
-        self.on_verify = False
-
         if(self.ProcessExists('connect.exe') == False):
             print('Your Adobe Connect is not running!')
             notification.notify(
@@ -19,17 +17,21 @@ class AdobeConnectFarsiType:
             )
             time.sleep(4)
             sys.exit(0)
-
         self.COMBINATIONS = []
         for com in self.Farsi_Combinations():
             self.COMBINATIONS.append({keyboard.KeyCode(char=com)})
         self.current = set()
-        
+
+        if(self.GetActiveKeyboardLanguage() == '0x409'):
+            self.NotifyStart()
+        else:
+            self.NotifyLanguageError()
+
         with keyboard.Listener(on_press=self.OnAnyKeyPressed, on_release=self.OnAnyKeyReleased) as listener:
-            time.sleep(1)
-            pyautogui.press('a')
             listener.join()
     
+        
+
     def Farsi_Combinations(self):
         return {
             'd':b'\xd9\x8a',
@@ -62,21 +64,15 @@ class AdobeConnectFarsiType:
         return last_line.lower().startswith(Process.lower())
 
     def Farsi_Formatter(self, key):
-        time.sleep(0.015)
-        pyautogui.press('backspace')
-        pyautogui.hotkey('shift', 'x')
+    def GetActiveKeyboardLanguage(self):
+        user32 = ctypes.WinDLL('user32', use_last_error=True)
+        curr_window = user32.GetForegroundWindow()
+        thread_id = user32.GetWindowThreadProcessId(curr_window, 0)
+        klid = user32.GetKeyboardLayout(thread_id)
+        lid = klid & (2**16 - 1)
+        return hex(lid)
 
     def OnAnyKeyPressed(self, key):
-        if(self.on_verify == False):
-            if key == keyboard.KeyCode(char='a'):
-                self.on_verify = True
-                pyautogui.press('backspace')
-                self.NotifyStart() # Start App
-            else:
-                self.on_verify = True
-                self.NotifyLanguageError() # Say Error
-
-
         if any([key in COMBO for COMBO in self.COMBINATIONS]):
             self.current.add(key)
             if any(all(k in self.current for k in COMBO) for COMBO in self.COMBINATIONS):

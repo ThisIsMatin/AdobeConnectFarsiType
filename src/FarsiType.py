@@ -8,6 +8,8 @@ import psutil
 import ctypes
 import win32process
 import win32gui
+import os
+import logging
 
 class AdobeConnectFarsiType:
     def __init__(self):
@@ -31,9 +33,12 @@ class AdobeConnectFarsiType:
         self.current = set()
 
         if(self.GetActiveKeyboardLanguage() == '0x409'):
-            self.keyboard_language = 'en'
-        elif(self.GetActiveKeyboardLanguage() == '0x429'):
+            pyautogui.hotkey('alt', 'shift')
             self.keyboard_language = 'fa'
+        elif(self.GetActiveKeyboardLanguage() == '0x429'):
+            pyautogui.hotkey('alt', 'shift')
+            print('Reloa')
+            self.RestartProgram()
         else:
             error_message = 'Unknown keyboard language! Please change your keyboard language to persian or english'
             print(error_message)
@@ -79,9 +84,19 @@ class AdobeConnectFarsiType:
         klid = user32.GetKeyboardLayout(thread_id)
         lid = klid & (2**16 - 1)
         return hex(lid)
+    
+    def RestartProgram(self):
+        try:
+            p = psutil.Process(os.getpid())
+            for handler in p.get_open_files() + p.connections():
+                os.close(handler.fd)
+        except:
+            pass
+
+        python = sys.executable
+        os.execl(python, python, *sys.argv)
 
     def OnAnyKeyPressed(self, key):
-        print(key)
         # Chcek for disabling tool, if alt and shift are held and the keyboard language is changed
         if(key == keyboard.Key.alt_l or key == keyboard.Key.alt_l or key == keyboard.Key.alt or key == keyboard.Key.alt_gr):
             self.on_alt_pressed = True

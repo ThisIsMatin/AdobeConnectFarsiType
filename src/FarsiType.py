@@ -28,39 +28,16 @@ class AdobeConnectFarsiType:
         self.current = set()
 
         if(self.GetActiveKeyboardLanguage() == '0x409'):
-            self.NotifyStart()
         else:
-            self.NotifyLanguageError()
 
         with keyboard.Listener(on_press=self.OnAnyKeyPressed, on_release=self.OnAnyKeyReleased) as listener:
             listener.join()
-    
-        
 
     def Farsi_Combinations(self):
         return {
             'd':b'\xd9\x8a',
             'ی':b'\xd9\x8a'
         }
-
-    def NotifyStart(self):
-        pyautogui.hotkey('alt', 'shift') # Change Language To Farsi
-        print('Adobe Connect Farsi Type Enabled !')
-        notification.notify(
-                title='Adobe Connect Farsi Type',
-                message='Adobe Connect Farsi Type Enabled !',
-                app_name='Adobe Connect Farsi Type',
-        )
-
-    def NotifyLanguageError(self):
-        print('To use, please make your keyboard language English first!\nThen the program automatically changes your keyboard to Persian.')
-        notification.notify(
-            title='Adobe Connect Farsi Type',
-            message='To use, please make your keyboard language English first!\nThen the program automatically changes your keyboard to Persian.',
-            app_name='Adobe Connect Farsi Type',
-        )
-        time.sleep(4)
-        sys.exit(0)
 
     def ProcessExists(self, Process):
         call = 'TASKLIST', '/FI', 'imagename eq %s' % Process

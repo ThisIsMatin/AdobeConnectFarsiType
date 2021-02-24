@@ -4,6 +4,10 @@ import subprocess
 import pyautogui
 import time
 import sys
+import psutil
+import ctypes
+import win32process
+import win32gui
 
 class AdobeConnectFarsiType:
     def __init__(self):
@@ -17,6 +21,7 @@ class AdobeConnectFarsiType:
             )
             time.sleep(4)
             sys.exit(0)
+        
         self.COMBINATIONS = []
         for com in self.Farsi_Combinations():
             self.COMBINATIONS.append({keyboard.KeyCode(char=com)})
@@ -64,6 +69,16 @@ class AdobeConnectFarsiType:
         return last_line.lower().startswith(Process.lower())
 
     def Farsi_Formatter(self, key):
+        if(self.GetActiveWindow() == 'connect.exe'):
+            time.sleep(0.015)
+            pyautogui.press('backspace')
+            pyautogui.hotkey('shift', 'x')
+    
+    def GetActiveWindow(self):
+        fgw = win32gui.GetForegroundWindow()
+        pid = win32process.GetWindowThreadProcessId(fgw)
+        return psutil.Process(pid[-1]).name()
+    
     def GetActiveKeyboardLanguage(self):
         user32 = ctypes.WinDLL('user32', use_last_error=True)
         curr_window = user32.GetForegroundWindow()

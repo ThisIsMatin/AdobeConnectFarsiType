@@ -12,6 +12,9 @@ import win32gui
 class AdobeConnectFarsiType:
     def __init__(self):
 
+        self.on_alt_pressed = False
+        self.keyboard_language = ''
+
         if(self.ProcessExists('connect.exe') == False):
             print('Your Adobe Connect is not running!')
             notification.notify(
@@ -28,8 +31,21 @@ class AdobeConnectFarsiType:
         self.current = set()
 
         if(self.GetActiveKeyboardLanguage() == '0x409'):
+            self.keyboard_language = 'en'
+        elif(self.GetActiveKeyboardLanguage() == '0x429'):
+            self.keyboard_language = 'fa'
         else:
+            error_message = 'Unknown keyboard language! Please change your keyboard language to persian or english'
+            print(error_message)
+            notification.notify(
+                title='Adobe Connect Farsi Type',
+                message=error_message,
+                app_name='Adobe Connect Farsi Type',
+            )
+            time.sleep(4)
+            sys.exit(0)
 
+        print('Adobe Connect Farsi Type Enabled !')
         with keyboard.Listener(on_press=self.OnAnyKeyPressed, on_release=self.OnAnyKeyReleased) as listener:
             listener.join()
 
@@ -46,7 +62,7 @@ class AdobeConnectFarsiType:
         return last_line.lower().startswith(Process.lower())
 
     def Farsi_Formatter(self, key):
-        if(self.GetActiveWindow() == 'connect.exe'):
+        if(self.GetActiveWindow() == 'connect.exe' and self.keyboard_language == 'fa'):
             time.sleep(0.015)
             pyautogui.press('backspace')
             pyautogui.hotkey('shift', 'x')
@@ -65,12 +81,25 @@ class AdobeConnectFarsiType:
         return hex(lid)
 
     def OnAnyKeyPressed(self, key):
+        print(key)
+        # Chcek for disabling tool, if alt and shift are held and the keyboard language is changed
+        if(key == keyboard.Key.alt_l or key == keyboard.Key.alt_l or key == keyboard.Key.alt or key == keyboard.Key.alt_gr):
+            self.on_alt_pressed = True
+            
+        if(key == keyboard.Key.shift or key == keyboard.Key.shift_l or key == keyboard.Key.shift_r):
+            if(self.on_alt_pressed == True):
+                self.keyboard_language = 'en' if self.keyboard_language == 'fa' else 'fa'
+                self.on_alt_pressed = False
+
         if any([key in COMBO for COMBO in self.COMBINATIONS]):
             self.current.add(key)
             if any(all(k in self.current for k in COMBO) for COMBO in self.COMBINATIONS):
                 self.Farsi_Formatter(key)
 
     def OnAnyKeyReleased(self, key):
+        if(key == keyboard.Key.alt_l or key == keyboard.Key.alt_l):
+            self.on_alt_pressed = False
+        
         if any([key in COMBO for COMBO in self.COMBINATIONS]):
             self.current.remove(key)
 

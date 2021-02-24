@@ -37,7 +37,7 @@ class AdobeConnectFarsiType:
             self.keyboard_language = 'fa'
         elif(self.GetActiveKeyboardLanguage() == '0x429'):
             pyautogui.hotkey('alt', 'shift')
-            print('Reloa')
+            print('Reloading your keyboard data...')
             self.RestartProgram()
         else:
             error_message = 'Unknown keyboard language! Please change your keyboard language to persian or english'

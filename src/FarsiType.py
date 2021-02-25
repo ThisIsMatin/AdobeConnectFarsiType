@@ -1,5 +1,6 @@
 from pynput import keyboard
 from plyer import notification
+import os
 import subprocess
 import pyautogui
 import time
@@ -8,8 +9,6 @@ import psutil
 import ctypes
 import win32process
 import win32gui
-import os
-import logging
 
 class AdobeConnectFarsiType:
     def __init__(self):
@@ -28,17 +27,21 @@ class AdobeConnectFarsiType:
             sys.exit(0)
         
         self.COMBINATIONS = []
+
         for com in self.Farsi_Combinations():
             self.COMBINATIONS.append({keyboard.KeyCode(char=com)})
+            
         self.current = set()
 
         if(self.GetActiveKeyboardLanguage() == '0x409'):
             pyautogui.hotkey('alt', 'shift')
             self.keyboard_language = 'fa'
+
         elif(self.GetActiveKeyboardLanguage() == '0x429'):
             pyautogui.hotkey('alt', 'shift')
             print('Reloading your keyboard data...')
             self.RestartProgram()
+
         else:
             error_message = 'Unknown keyboard language! Please change your keyboard language to persian or english'
             print(error_message)
@@ -51,6 +54,7 @@ class AdobeConnectFarsiType:
             sys.exit(0)
 
         print('Adobe Connect Farsi Type Enabled !')
+        
         with keyboard.Listener(on_press=self.OnAnyKeyPressed, on_release=self.OnAnyKeyReleased) as listener:
             listener.join()
 

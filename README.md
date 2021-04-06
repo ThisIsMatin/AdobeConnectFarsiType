@@ -27,4 +27,4 @@ But with this simple script, you can fix this problem and type correctly in Adob
 
 * Install the modules whose names are in the requirements file using (``` pip install -r requirements.txt ```).
 
-* Just run the source, using (```python src/FarsiType.py```).
+* Just run the init file, using (```python src/__init__.py```).

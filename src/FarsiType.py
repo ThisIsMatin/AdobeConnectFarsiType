@@ -152,5 +152,3 @@ class AdobeConnectFarsiType:
         
         if any([key in COMBO for COMBO in self.COMBINATIONS]):
             self.current.remove(key)
-
-app = AdobeConnectFarsiType()
